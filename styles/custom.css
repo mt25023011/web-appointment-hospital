@@ -1,0 +1,127 @@
+@charset "UTF-8";
+/* Các biến SCSS */
+/* Reset margin và padding */
+body {
+  margin: 0;
+  padding: 0; }
+
+/* Header */
+.header {
+  background: url("../images/banner.jpg") center center no-repeat;
+  background-size: cover;
+  /* Fluid Container */ }
+  .header .container-fluid {
+    width: 100%;
+    padding: 0 1rem;
+    margin: 0 auto;
+    box-sizing: border-box;
+    /* Fixed Container */ }
+    .header .container-fluid .container {
+      width: 71.25rem;
+      padding: 0 1rem;
+      margin: 0 auto;
+      box-sizing: border-box;
+      /* About and Sign-In */
+      /* Logo */
+      /* Content Center */
+      /* Text */
+      /* Button */ }
+      .header .container-fluid .container .about-sign-in {
+        height: 5rem;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center; }
+        .header .container-fluid .container .about-sign-in ul {
+          display: flex;
+          list-style: none;
+          margin: 0;
+          padding: 0; }
+          .header .container-fluid .container .about-sign-in ul .about,
+          .header .container-fluid .container .about-sign-in ul .sign-in {
+            text-decoration: none;
+            display: inline-block; }
+          .header .container-fluid .container .about-sign-in ul .about {
+            color: #000;
+            width: 5.125rem;
+            height: 2.25rem;
+            text-align: center;
+            line-height: 2.25rem;
+            padding: 0 3.125rem; }
+          .header .container-fluid .container .about-sign-in ul .sign-in {
+            width: 5.125rem;
+            height: 2.25rem;
+            border: 2px solid #8bc34a;
+            color: #8bc34a;
+            border-radius: 100px;
+            text-align: center;
+            line-height: 2.25rem;
+            transition: background-color 0.3s, color 0.3s; }
+          .header .container-fluid .container .about-sign-in ul .sign-in:hover {
+            background-color: #8bc34a;
+            color: white; }
+      .header .container-fluid .container .logo {
+        position: relative;
+        width: 100%;
+        padding: 0 1rem; }
+        .header .container-fluid .container .logo img {
+          height: 4.8125rem;
+          width: 16rem;
+          margin: 10.3125rem auto 3.3125rem;
+          display: block; }
+      .header .container-fluid .container .content-center {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        height: 9.375rem; }
+        .header .container-fluid .container .content-center div {
+          text-align: center; }
+          .header .container-fluid .container .content-center div img {
+            width: 3.25rem;
+            height: 3rem;
+            margin-bottom: 0.875rem;
+            overflow: clip; }
+          .header .container-fluid .container .content-center div span {
+            display: block;
+            font-family: "Roboto", sans-serif;
+            font-size: 36px;
+            font-weight: 400;
+            letter-spacing: -0.07px;
+            line-height: 48px; }
+      .header .container-fluid .container .text {
+        font-family: "Roboto", sans-serif;
+        font-size: 16px;
+        font-weight: 400;
+        letter-spacing: -0.07px;
+        line-height: 24px;
+        color: #000;
+        text-align: center;
+        margin: 0 0 1.5rem 0; }
+      .header .container-fluid .container .btn-start-now {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        height: 18.75rem; }
+        .header .container-fluid .container .btn-start-now .btn-start {
+          border-radius: 100px;
+          background: linear-gradient(311.12deg, #B4EC51 0%, #429321 100%);
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+          font-family: "Roboto", sans-serif;
+          color: #FFFFFF;
+          letter-spacing: 1.33px;
+          line-height: 1.3125rem;
+          text-transform: uppercase;
+          cursor: pointer;
+          height: 2.5rem;
+          width: 9rem; }
+
+/* Media Queries cho Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    width: 100% !important; }
+
+  .content-center {
+    grid-template-columns: 1fr !important;
+    height: auto !important; }
+
+  .btn-start-now {
+    height: auto !important; } }
