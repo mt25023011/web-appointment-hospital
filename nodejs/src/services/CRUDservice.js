@@ -15,7 +15,6 @@ let hashUserPassword = (password) => {
 
 
 let createNewUser = async (data) => {
-
     return new Promise(async (resolve, reject) => {
         try {
             let hashPassword = await hashUserPassword(data.password)
@@ -28,6 +27,7 @@ let createNewUser = async (data) => {
                 phoneNumber: data.phoneNumber,
                 gender: data.gender === "1" ? true : false,
                 roleID: "R" + data.role,
+                image: data.image || null
             })
             resolve("Create user successfully")
         } catch (error) {
@@ -65,27 +65,42 @@ let getUserById = (id) => {
 let updateUser = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
-            if (data.password && data.password !== data.currentPassword) {
-                let hashPassword = await hashUserPassword(data.password)
-                data.password = hashPassword
+            if (!data.id) {
+                reject(new Error('User ID is required for update'));
+                return;
             }
-            let user = await db.User.update(
-                {
-                    roleID: "R" + data.role,
-                    firstName: data.firstName,
-                    lastName: data.lastName,
-                    address: data.address,
-                    phoneNumber: data.phoneNumber,
-                    gender: data.gender === "1" ? true : false,
-                    email: data.email,
-                    password: data.password,
-                }, { where: { id: data.id } })
-            resolve(user)
+
+            const updateData = {
+                firstName: data.firstName,
+                lastName: data.lastName,
+                address: data.address,
+                phoneNumber: data.phoneNumber,
+                gender: data.gender === "1" ? true : false,
+                email: data.email,
+                roleID: "R" + data.role
+            };
+
+            // Handle password update if provided
+            if (data.password && data.password !== data.currentPassword) {
+                updateData.password = await hashUserPassword(data.password);
+            }
+
+            // Handle image update if provided
+            if (data.image) {
+                updateData.image = data.image;
+            }
+
+            const user = await db.User.update(
+                updateData,
+                { where: { id: data.id } }
+            );
+
+            resolve(user);
         } catch (error) {
-            reject(error) 
+            reject(error);
         }
-    })
-}
+    });
+};
 
 let deleteUser = (id) => {
     return new Promise(async (resolve, reject) => {

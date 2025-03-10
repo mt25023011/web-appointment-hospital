@@ -16,7 +16,7 @@
                 <h2>Update a user</h2>
             </div>
             <div class="col-12 mt-3">
-                <form action="/crud/put-crud" method="POST" class="row g-3">
+                <form action="/crud/put-crud" method="POST" enctype="multipart/form-data" class="row g-3">
                     <div class="col-12 col-md-6">
                         <label for="email" class="form-label">Email</label>
                         <input type="email" class="form-control" id="email" name="email" value="<%= data.email %>">
@@ -66,6 +66,19 @@
                             <option value="1" <%=data.roleID==='R1' ? 'selected' : '' %>>Doctor</option>
                             <option value="0" <%=data.roleID==='R0' ? 'selected' : '' %>>Admin</option>
                         </select>
+                    </div>
+                    <div class="col-12">
+                        <% if(data.image) { %>
+                            <div class="mb-3">
+                                <label class="form-label">Current Image</label>
+                                <div>
+                                    <img src="<%= data.image %>" alt="Current user image"
+                                        style="max-width: 200px; height: auto;">
+                                </div>
+                            </div>
+                            <% } %>
+                                <label for="image" class="form-label">Update Image</label>
+                                <input type="file" class="form-control" id="image" name="image" accept="image/*">
                     </div>
                     <div class="col-12">
                         <button type="submit" class="btn btn-primary">Update Account</button>
