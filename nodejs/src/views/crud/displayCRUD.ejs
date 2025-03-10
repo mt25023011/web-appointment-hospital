@@ -46,7 +46,6 @@
                             <tr>
                                 <th class="px-4 py-3">Image</th>
                                 <th class="px-4 py-3">Email</th>
-                                <th class="px-4 py-3">Password</th>
                                 <th class="px-4 py-3">First Name</th>
                                 <th class="px-4 py-3">Last Name</th>
                                 <th class="px-4 py-3">Address</th>
@@ -75,9 +74,6 @@
                                         <%= user.email %>
                                     </td>
                                     <td class="px-4">
-                                        <%= user.password %>
-                                    </td>
-                                    <td class="px-4">
                                         <%= user.firstName %>
                                     </td>
                                     <td class="px-4">
@@ -90,13 +86,16 @@
                                         <%= user.phoneNumber %>
                                     </td>
                                     <td class="px-4">
-                                        <span class="badge bg-info">
-                                            <%= user.gender %>
+                                        <span
+                                            class="badge gender-badge <%= user.gender == 1 ? 'bg-blue' : 'bg-pink' %>">
+                                            <%= user.gender==1 ? 'Male' : 'Female' %>
                                         </span>
                                     </td>
                                     <td class="px-4">
-                                        <span class="badge bg-primary">
-                                            <%= user.roleID %>
+                                        <span
+                                            class="badge role-badge <%= user.roleID == 2 ? 'bg-doctor' : (user.roleID == 1 ? 'bg-admin' : 'bg-patient') %>">
+                                            <%= user.roleID=="R1" ? 'Doctor' : (user.roleID=="R0" ? 'Admin' : 'Patient'
+                                                ) %>
                                         </span>
                                     </td>
                                     <td class="px-4">
@@ -201,13 +200,37 @@
 
             // Check if error has been shown before
             if (error && !sessionStorage.getItem('errorShown')) {
-                Swal.fire({
-                    title: 'Error!',
-                    text: error,
+                let errorMessage = error;
+
+                // Customize error message for specific cases
+                if (error.toLowerCase().includes('user not found')) {
+                    errorMessage = 'User not found in the system.';
+                }
+
+                const toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 2000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    },
+                    willClose: () => {
+                        // Ensure overlay is removed
+                        const overlay = document.querySelector('.swal2-container');
+                        if (overlay) {
+                            overlay.remove();
+                        }
+                    }
+                });
+
+                toast.fire({
                     icon: 'error',
-                    confirmButtonText: 'OK',
+                    title: errorMessage,
                     customClass: {
-                        popup: 'animated shake faster'
+                        popup: 'animated fadeInDown faster'
                     }
                 });
 
@@ -267,6 +290,44 @@
         .badge {
             padding: 0.5em 1em;
             font-weight: 500;
+            font-size: 0.85rem;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .badge:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Gender Badge Colors */
+        .gender-badge.bg-blue {
+            background-color: #4a90e2 !important;
+            color: white;
+        }
+
+        .gender-badge.bg-pink {
+            background-color: #e83e8c !important;
+            color: white;
+        }
+
+        /* Role Badge Colors */
+        .role-badge.bg-admin {
+            background-color: #2c3e50 !important;
+            color: white;
+        }
+
+        .role-badge.bg-doctor {
+            background-color: #27ae60 !important;
+            color: white;
+        }
+
+        .role-badge.bg-patient {
+            background-color: #3498db !important;
+            color: white;
         }
 
         .user-avatar {
