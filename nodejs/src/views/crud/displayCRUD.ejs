@@ -160,7 +160,14 @@
             const message = urlParams.get('message');
             const error = urlParams.get('error');
 
-            if (message) {
+            // Clean up URL without reloading the page
+            if (message || error) {
+                const newUrl = window.location.pathname;
+                window.history.replaceState({}, '', newUrl);
+            }
+
+            // Check if message has been shown before
+            if (message && !sessionStorage.getItem('messageShown')) {
                 const toast = Swal.mixin({
                     toast: true,
                     position: 'top-end',
@@ -187,9 +194,13 @@
                         popup: 'animated fadeInDown faster'
                     }
                 });
+
+                // Mark message as shown
+                sessionStorage.setItem('messageShown', 'true');
             }
 
-            if (error) {
+            // Check if error has been shown before
+            if (error && !sessionStorage.getItem('errorShown')) {
                 Swal.fire({
                     title: 'Error!',
                     text: error,
@@ -199,7 +210,16 @@
                         popup: 'animated shake faster'
                     }
                 });
+
+                // Mark error as shown
+                sessionStorage.setItem('errorShown', 'true');
             }
+
+            // Clear storage when leaving the page
+            window.addEventListener('beforeunload', function () {
+                sessionStorage.removeItem('messageShown');
+                sessionStorage.removeItem('errorShown');
+            });
         });
     </script>
 
