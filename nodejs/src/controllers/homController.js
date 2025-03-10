@@ -23,7 +23,7 @@ let homeController = async (req, res) => {
 }
 
 let getCRUD = (req, res) => {
-    return res.render("crud", {
+    return res.render("crud/createCRUD", {
         message: req.query.message,
         error: req.query.error
     })
@@ -32,23 +32,23 @@ let getCRUD = (req, res) => {
 let postCRUD = async (req, res) => {
     try {
         await CRUDservice.createNewUser(req.body);
-        return res.redirect('/get-crud?message=User created successfully');
+        return res.redirect('/crud/show?message=User created successfully');
     } catch (error) {
         console.log(error);
-        return res.redirect(`/get-crud?error=Failed to create user: ${error.message}`);
+        return res.redirect(`/crud/show?error=Failed to create user: ${error.message}`);
     }
 }
 
 let displayGetCRUD = async (req, res) => {
     try {
         let data = await CRUDservice.getAllUser()
-        return res.render("displayCRUD", {
+        return res.render("crud/displayCRUD", {
             data: data,
             message: req.query.message,
             error: req.query.error
         })
     } catch (error) {
-        return res.render("displayCRUD", {
+        return res.render("crud/displayCRUD", {
             data: [],
             error: "Failed to fetch users: " + error.message
         })
@@ -59,31 +59,31 @@ let editCRUD = async (req, res) => {
     try {
         let id = req.query.id;
         if (!id) {
-            return res.redirect('/get-crud?error=User ID is required');
+            return res.redirect('/crud/show?error=User ID is required');
         }
         
         let userData = await CRUDservice.getUserById(id);
         if (!userData) {
-            return res.redirect('/get-crud?error=User not found');
+            return res.redirect('/crud/show?error=User not found');
         }
 
-        return res.render("editCRUD", {
+        return res.render("crud/editCRUD", {
             data: userData,
             message: req.query.message,
             error: req.query.error
         });
     } catch (error) {
         console.log('Error:', error);
-        return res.redirect(`/get-crud?error=Error editing user: ${error.message}`);
+        return res.redirect(`/crud/show?error=Error editing user: ${error.message}`);
     }
 }
 
 let putCRUD = async (req, res) => {
     try {
         await CRUDservice.updateUser(req.body);
-        return res.redirect('/get-crud?message=User updated successfully');
+        return res.redirect('/crud/show?message=User updated successfully');
     } catch (error) {
-        return res.redirect(`/get-crud?error=Failed to update user: ${error.message}`);
+        return res.redirect(`/crud/show?error=Failed to update user: ${error.message}`);
     }
 }
 
@@ -91,25 +91,18 @@ let deleteCRUD = async (req, res) => {
     try {
         let id = req.query.id;
         if (!id) {
-            return res.redirect('/get-crud?error=User ID is required for deletion');
+            return res.redirect('/crud/show?error=User ID is required for deletion');
         }
         await CRUDservice.deleteUser(id);
-        return res.redirect('/get-crud?message=User deleted successfully');
+        return res.redirect('/crud/show?message=User deleted successfully');
     } catch (error) {
-        return res.redirect(`/get-crud?error=Failed to delete user: ${error.message}`);
+        return res.redirect(`/crud/show?error=Failed to delete user: ${error.message}`);
     }
 }
 
-let aboutController = (req, res) => {
-    return res.render("about", {
-        message: req.query.message,
-        error: req.query.error
-    })
-}
 
 module.exports = {
     homeController: homeController,
-    aboutController: aboutController,
     getCRUD: getCRUD,
     postCRUD: postCRUD,
     displayGetCRUD: displayGetCRUD,

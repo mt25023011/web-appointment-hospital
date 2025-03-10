@@ -68,7 +68,7 @@
         <div class="card shadow">
             <div class="card-header bg-primary text-white">
                 <h2 class="header-title mb-0">User Management</h2>
-                <a href="/crud" class="btn btn-success header-button">Add New User</a>
+                <a href="/crud/create" class="btn btn-success header-button">Add New User</a>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -115,7 +115,7 @@
                                     </td>
                                     <td>
                                         <div class="btn-group" role="group">
-                                            <a href="/edit-crud?id=<%= user.id %>" class="btn btn-warning btn-sm me-1">
+                                            <a href="/crud/edit-crud?id=<%= user.id %>" class="btn btn-warning btn-sm me-1">
                                                 <i class="fas fa-edit"></i> Edit
                                             </a>
                                             <button onclick="confirmDelete('<%= user.id %>', '<%= user.firstName %>')"
@@ -167,7 +167,7 @@
                 cancelButtonText: 'Cancel'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = `/delete-crud?id=${userId}`;
+                    window.location.href = `/crud/delete-crud?id=${userId}`;
                 }
             });
         }
