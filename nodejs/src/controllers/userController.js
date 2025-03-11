@@ -1,7 +1,8 @@
-const db = require('../models');
 const bcrypt = require('bcrypt');
 const fs = require('fs');
 const path = require('path');
+import { name } from "ejs";
+import db, { sequelize } from "../models/index"
 
 const handleUserImage = async (userId, imageFile, oldImagePath = null) => {
     try {
@@ -21,164 +22,132 @@ const handleUserImage = async (userId, imageFile, oldImagePath = null) => {
     }
 };
 
-const userController = {
-    createUser: async (req, res) => {
-        try {
-            const { firstName, lastName, email, password, phoneNumber, gender, address, roleID, positionID } = req.body;
-            
-            // Hash password
-            const salt = await bcrypt.genSalt(10);
-            const hashedPassword = await bcrypt.hash(password, salt);
-            
-            // Handle image upload
-            const imagePath = req.file ? await handleUserImage(null, req.file) : null;
-            
-            // Create user
-            const newUser = await db.User.create({
-                firstName,
-                lastName,
-                email,
-                password: hashedPassword,
-                phoneNumber,
-                gender,
-                image: imagePath,
-                address,
-                roleID,
-                positionID
-            });
-            
-            res.status(201).json({
-                success: true,
-                message: 'User created successfully',
-                data: {
-                    id: newUser.id,
-                    firstName: newUser.firstName,
-                    lastName: newUser.lastName,
-                    email: newUser.email,
-                    image: newUser.image
-                }
-            });
-        } catch (error) {
-            console.error('Error creating user:', error);
-            res.status(500).json({
-                success: false,
-                message: 'Error creating user',
-                error: error.message
-            });
-        }
-    },
-
-    updateUser: async (req, res) => {
-        try {
-            const userId = req.params.id;
-            const updateData = { ...req.body };
-            
-            // Get current user
-            const user = await db.User.findByPk(userId);
-            if (!user) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'User not found'
-                });
-            }
-
-            // Handle password update
-            if (updateData.password) {
-                const salt = await bcrypt.genSalt(10);
-                updateData.password = await bcrypt.hash(updateData.password, salt);
-            }
-
-            // Handle image update
-            if (req.file) {
-                updateData.image = await handleUserImage(userId, req.file, user.image);
-            }
-
-            // Update user
-            await user.update(updateData);
-
-            res.json({
-                success: true,
-                message: 'User updated successfully',
-                data: {
-                    id: user.id,
-                    firstName: user.firstName,
-                    lastName: user.lastName,
-                    email: user.email,
-                    image: user.image
-                }
-            });
-        } catch (error) {
-            console.error('Error updating user:', error);
-            res.status(500).json({
-                success: false,
-                message: 'Error updating user',
-                error: error.message
-            });
-        }
-    },
-
-    deleteUser: async (req, res) => {
-        try {
-            const userId = req.params.id;
-            
-            // Get user
-            const user = await db.User.findByPk(userId);
-            if (!user) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'User not found'
-                });
-            }
-
-            // Delete user's image if exists
-            if (user.image) {
-                await handleUserImage(userId, null, user.image);
-            }
-
-            // Delete user
-            await user.destroy();
-
-            res.json({
-                success: true,
-                message: 'User deleted successfully'
-            });
-        } catch (error) {
-            console.error('Error deleting user:', error);
-            res.status(500).json({
-                success: false,
-                message: 'Error deleting user',
-                error: error.message
-            });
-        }
-    },
-
-    getUser: async (req, res) => {
-        try {
-            const userId = req.params.id;
-            const user = await db.User.findByPk(userId, {
-                attributes: { exclude: ['password'] }
-            });
-
-            if (!user) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'User not found'
-                });
-            }
-
-            res.json({
-                success: true,
-                data: user
-            });
-        } catch (error) {
-            console.error('Error fetching user:', error);
-            res.status(500).json({
-                success: false,
-                message: 'Error fetching user',
-                error: error.message
-            });
-        }
+let getlistUser = async (req, res) => {
+    try {
+        let data = await db.User.findAll()
+        return res.status(200).json(data)
+    } catch (error) {
+        return res.status(500).json({ error: "Error fetching users: " + error.message })
     }
-};
+}
+let getUserById = async (req, res) => {
+    try {
+        if (!req.query.id) {
+            return res.status(400).json({ error: "User ID is required" })
+        }
+        let data = await db.User.findOne({
+            where: {
+                id: req.query.id
+            }
+        })
+        if (data===null) {
+            return res.status(404).json({ error: "User not found" })
+        }
+        return res.status(200).json(data)
+    } catch (error) {
+        return res.status(500).json({ error: "Error fetching user: " + error.message })
+    }
+}
 
-module.exports = userController; 
+let createUser = async (req, res) => {
+    try {
+        const { firstName, lastName, email, password, phoneNumber, address, image } = req.body;
+        if(!image) {
+            const defaultImage = "default-avatar.jpg";
+            let data = await db.User.create({   
+                firstName: firstName,
+                lastName: lastName,
+                email: email,
+                password: password,
+                phoneNumber: phoneNumber,
+                address: address,
+                image: defaultImage
+            })
+            return res.status(200).json(data)
+        }
+
+        let data = await db.User.create({   
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+            password: password,
+            phoneNumber: phoneNumber,
+            address: address,
+            image: image
+        })
+        return res.status(200).json(data)
+    } catch (error) {
+        return res.status(500).json({ error: "Error creating user: " + error.message })
+    }
+}
+
+let updateUser = async (req, res) => {
+    try {
+        const { id, firstName, lastName, email, password, phoneNumber, address, image } = req.body;
+        let user = await db.User.findOne({
+            where: {
+                id: id
+            }
+        });
+        if(!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        // Create update object with only provided fields
+        const updateData = {};
+        if (firstName !== undefined) updateData.firstName = firstName;
+        if (lastName !== undefined) updateData.lastName = lastName;
+        if (email !== undefined) updateData.email = email;
+        if (password !== undefined) updateData.password = password;
+        if (phoneNumber !== undefined) updateData.phoneNumber = phoneNumber;
+        if (address !== undefined) updateData.address = address;
+        if (image !== undefined) updateData.image = image;
+        let data = await db.User.update(updateData, {
+            where: { id: id }
+        });
+        
+        // Fetch and return updated user data
+        const updatedUser = await db.User.findOne({
+            where: { id: id }
+        });
+        return res.status(200).json(updatedUser);
+    } catch (error) {
+        return res.status(500).json({ error: "Error updating user: " + error.message });
+    }
+}
+
+let deleteUser = async (req, res) => {
+    try {
+        const id = req.query.id;
+        if (!id) {
+            return res.status(400).json({ error: "User ID is required" });
+        }
+
+        let user = await db.User.findOne({
+            where: { id: id }
+        });
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        await db.User.destroy({
+            where: { id: id }
+        });
+
+        return res.status(200).json({ 
+            message: "User deleted successfully",
+            deletedUserId: id 
+        });
+    } catch (error) {
+        return res.status(500).json({ error: "Error deleting user: " + error.message });
+    }
+}
+
+module.exports = {
+    getlistUser: getlistUser,
+    getUserById: getUserById,
+    createUser: createUser,
+    updateUser: updateUser,
+    deleteUser: deleteUser
+} 

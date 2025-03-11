@@ -288,5 +288,5 @@ module.exports = {
     displayGetCRUD: displayGetCRUD,
     editCRUD: editCRUD,
     putCRUD: putCRUD,
-    deleteCRUD: deleteCRUD
+    deleteCRUD: deleteCRUD,
 }
